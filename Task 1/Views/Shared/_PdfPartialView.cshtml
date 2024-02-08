@@ -1,0 +1,66 @@
+﻿@model IEnumerable<Task_1.Models.Student>
+@*@{
+    Layout = null;
+}
+
+<style>
+    /* Style the table */
+    #studentTable {
+        font-family: Arial, sans-serif;
+        border-collapse: collapse;
+        width: 100%;
+    }
+
+        /* Style the table header */
+        #studentTable th {
+            background-color: #f2f2f2;
+            color: #333;
+            font-weight: bold;
+            padding: 8px;
+            text-align: left;
+        }
+
+        /* Style the table rows */
+        #studentTable tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+
+        #studentTable tr:nth-child(odd) {
+            background-color: #ffffff;
+        }
+
+        /* Style the table cells */
+        #studentTable td {
+            padding: 8px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+</style>*@
+
+<table id="studentTable" class="table">
+    <tr>
+        <th>
+            @Html.DisplayNameFor(model => model.StudentId)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.StudentName)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.BirthDay)
+        </th>
+    </tr>
+    @foreach (var item in Model)
+    {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.StudentId)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.StudentName)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.BirthDay)
+            </td>
+        </tr>
+    }
+</table>

@@ -1,0 +1,32 @@
+﻿@*@{
+        ViewBag.Title = "StudentReport";
+    }
+
+    @using (Html.BeginForm("PrintReport", "Students", FormMethod.Post))
+    {
+        @Html.DropDownList("studentId", (SelectList)ViewBag.Students, "Select a student")
+        <input type="submit" class="btn" style="background-color: darkcyan; color: white;" value="Print Student Info Report" />
+    }*@
+
+@{
+    ViewBag.Title = "StudentReport";
+}
+
+@using (Html.BeginForm("PrintReport", "Students", FormMethod.Post))
+{
+    @Html.DropDownList("studentId", (SelectList)ViewBag.Students, "Select a student")
+    <input type="submit" class="btn" style="background-color: darkcyan; color: white;" value="Print Student Info Report" />
+}
+
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    $(document).ready(function () {
+        $('form').submit(function () {
+            if ($('#studentId').val() == "") {
+                alert('Please choose a student');
+                return false; // Prevent the form from submitting
+            }
+        });
+    });
+</script>

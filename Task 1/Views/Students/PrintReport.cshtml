@@ -1,0 +1,45 @@
+﻿@*@model Task_1.Models.Student
+
+    @{
+        Layout = null;
+    }
+
+    <!DOCTYPE html>
+
+    <html>
+    <head>
+        <meta name="viewport" content="width=device-width" />
+        <title>Student Info Report</title>
+    </head>
+    <body>
+        <h2><strong>@Model.StudentName</strong></h2>
+        <p>Date of Birth: @Model.BirthDay</p>
+        <p>Address: @Model.Address</p>
+        <p>Mobile Number: @Model.MobileNumber</p>
+        <p>Grade: @Model.Grade.GradeName</p>
+        <p>Country: @Model.Country.CountryName</p>
+
+    </body>
+    </html>*@
+
+@model Task_1.Models.Student
+
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Student Info Report</title>
+</head>
+<body>
+    <div>
+        <iframe src="@Url.Action("PrintReport", "Students", new { studentId = Model.StudentId })" width="100%" height="600"></iframe>
+    </div>
+</body>
+</html>
+
+

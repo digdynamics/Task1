@@ -1,0 +1,83 @@
+﻿@model IEnumerable<Task_1.Models.Student>
+
+@{
+    ViewBag.Title = "Student";
+}
+
+<h2>Student</h2>
+
+<form class="d-flex" asp-action="Filter" asp-controller="Students" method="post" id="searchForm">
+
+    <div class="form-group">
+        <input class="form-control me-sm-2" id="StudentName" name="StudentName" type="text" placeholder="Student Name">
+    </div>
+
+    <div class="form-group">
+        <input class="form-control me-sm-2" id="StudentId" name="StudentId" type="number" placeholder="Student Id">
+    </div>
+
+    <button class="btn btn-primary my-2 my-sm-0" type="submit" id="searchButton">Search</button>
+</form>
+
+<a href="@Url.Action("ExportToExcel", "Students", new { studentIds = string.Join(",", Model.Select(s => s.StudentId)) })" class="btn" style="background-color: darkcyan; color: white;">Excel</a>
+
+<a href="@Url.Action("GeneratePdf", "Students", new { studentIds = string.Join(",", Model.Select(s => s.StudentId)) })" class="btn" style="background-color: darkgoldenrod; color: white;">Pdf</a>
+
+<table id="studentTable" class="table">
+    <tr>
+        <th>
+            @Html.DisplayNameFor(model => model.StudentId)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.StudentName)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.BirthDay)
+        </th>
+        <th></th>
+    </tr>
+    @if (Model.Count() > 0)
+    {
+        foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.StudentId)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.StudentName)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.BirthDay)
+                </td>
+                <td></td>
+            </tr>
+        }
+    }
+    else
+    {
+        <tr>
+            <td colspan="3">No data found.</td>
+        </tr>
+    }
+</table>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script type="text/javascript">
+    $(document).ready(function () {
+        $('#searchButton').click(function () {
+            sessionStorage.setItem('studentName', $('#StudentName').val());
+            sessionStorage.setItem('studentId', $('#StudentId').val());
+        });
+
+        var storedStudentName = sessionStorage.getItem('studentName');
+        var storedStudentId = sessionStorage.getItem('studentId');
+
+        if (storedStudentName) {
+            $('#StudentName').val(storedStudentName);
+        }
+        if (storedStudentId) {
+            $('#StudentId').val(storedStudentId);
+        }
+    });
+</script>
