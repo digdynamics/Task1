@@ -142,21 +142,22 @@ namespace Task_1.Controllers
             base.Dispose(disposing);
         }
 
-        
+
         public ActionResult Student(string studentName, int? studentId)
         {
             var students = db.Students
                 .Include(s => s.Country)
                 .Include(s => s.Grade);
-            //if (studentName != null && studentId != null)
-            //{
-            //    students = students.Where(x => (!studentId.HasValue || x.StudentId == studentId) && (studentName == null || x.StudentName == studentName));
-            //}
-            if (studentName != null && studentId == null)
+
+            if (studentName != null&&studentName !="" && studentId != null)
+            {
+                students = students.Where(x => ( x.StudentId == studentId) && ( x.StudentName == studentName));
+            }
+            else if(studentName != null && studentId == null)
             {
                 students = students.Where(x => x.StudentName == studentName);
             }
-            else if (studentId != null)
+            else if (studentId != null )
             {
                 students = students.Where(x => x.StudentId == studentId);
             }
@@ -166,53 +167,67 @@ namespace Task_1.Controllers
             }
 
             var result = students.ToList();
+
+            if (Request.IsAjaxRequest())
+            {
+                return PartialView("_StudentTablePartialView", result);
+            }
+
             return View(result);
         }
 
 
-        
+
+
 
 
         public ActionResult ExportToExcel(string studentIds)
         {
-            try
+            if (studentIds != null)
             {
-                ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
-
-                var idsArray = studentIds.Split(',').Select(int.Parse).ToList();
-
-                var students = db.Students
-                    .Include(s => s.Country)
-                    .Include(s => s.Grade)
-                    .Where(s => idsArray.Contains(s.StudentId))
-                    .ToList();
-
-                var excelPackage = new ExcelPackage();
-                var worksheet = excelPackage.Workbook.Worksheets.Add("Students");
-
-                worksheet.Cells["A1"].Value = "Student ID";
-                worksheet.Cells["B1"].Value = "Student Name";
-                worksheet.Cells["C1"].Value = "Birthday";
-                // Add other headers as needed
-
-                int row = 2;
-                foreach (var student in students)
+                try
                 {
-                    worksheet.Cells[string.Format("A{0}", row)].Value = student.StudentId;
-                    worksheet.Cells[string.Format("B{0}", row)].Value = student.StudentName;
-                    worksheet.Cells[string.Format("c{0}", row)].Value = student.BirthDay.ToString("MM/dd/yyyy");
-                    // Add other data as needed
-                    row++;
-                }
+                    ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
 
-                byte[] fileContents = excelPackage.GetAsByteArray();
-                return File(fileContents, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "Students.xlsx");
+                    var idsArray = studentIds.Split(',').Select(int.Parse).ToList();
+
+                    var students = db.Students
+                        .Include(s => s.Country)
+                        .Include(s => s.Grade)
+                        .Where(s => idsArray.Contains(s.StudentId))
+                        .ToList();
+
+                    var excelPackage = new ExcelPackage();
+                    var worksheet = excelPackage.Workbook.Worksheets.Add("Students");
+
+                    worksheet.Cells["A1"].Value = "Student ID";
+                    worksheet.Cells["B1"].Value = "Student Name";
+                    worksheet.Cells["C1"].Value = "Birthday";
+                    // Add other headers as needed
+
+                    int row = 2;
+                    foreach (var student in students)
+                    {
+                        worksheet.Cells[string.Format("A{0}", row)].Value = student.StudentId;
+                        worksheet.Cells[string.Format("B{0}", row)].Value = student.StudentName;
+                        worksheet.Cells[string.Format("c{0}", row)].Value = student.BirthDay.ToString("MM/dd/yyyy");
+                        // Add other data as needed
+                        row++;
+                    }
+
+                    byte[] fileContents = excelPackage.GetAsByteArray();
+                    return File(fileContents, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "Students.xlsx");
+                }
+                catch (Exception ex)
+                {
+
+                    return View("Error");
+                }
             }
-            catch (Exception ex)
+            else
             {
-                
-                return View("Error");
-            }
+                return RedirectToAction("Student");
+            }           
         }
 
 
@@ -225,13 +240,21 @@ namespace Task_1.Controllers
 
         public ActionResult GeneratePdf(string studentIds)
         {
-            var idsArray = studentIds.Split(',').Select(int.Parse).ToList();
-            var students = db.Students
-                    .Include(s => s.Country)
-                    .Include(s => s.Grade)
-                    .Where(s => idsArray.Contains(s.StudentId))
-                    .ToList();
-            return new ViewAsPdf("_PdfPartialView", students) { FileName = "StudentTable.pdf" };
+            if (studentIds != null)
+            {
+                var idsArray = studentIds.Split(',').Select(int.Parse).ToList();
+                var students = db.Students
+                        .Include(s => s.Country)
+                        .Include(s => s.Grade)
+                        .Where(s => idsArray.Contains(s.StudentId))
+                        .ToList();
+                return new ViewAsPdf("_PdfPartialView", students) { FileName = "StudentTable.pdf" };
+            }
+            else
+            {
+                return RedirectToAction("Student");
+            }
+            
         }
 
 
