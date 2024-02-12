@@ -8,17 +8,19 @@ using System.Web;
 using System.Web.Mvc;
 using Task_1.Data;
 using Task_1.Models;
+using Task_1.Services;
 
 namespace Task_1.Controllers
 {
     public class CountriesController : Controller
     {
-        private ApplicationDbContext db = new ApplicationDbContext();
+        //private ApplicationDbContext db = new ApplicationDbContext();
+        private CountryService _countryService = new CountryService();
 
         // GET: Countries
         public ActionResult Index()
         {
-            return View(db.Countries.ToList());
+            return View(_countryService.GetCountries());
         }
 
         // GET: Countries/Details/5
@@ -28,7 +30,7 @@ namespace Task_1.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            Country country = db.Countries.Find(id);
+            Country country = _countryService.GetCountryById((int)id);
             if (country == null)
             {
                 return HttpNotFound();
@@ -51,8 +53,7 @@ namespace Task_1.Controllers
         {
             if (ModelState.IsValid)
             {
-                db.Countries.Add(country);
-                db.SaveChanges();
+                _countryService.AddCountry(country);
                 return RedirectToAction("Index");
             }
 
@@ -66,7 +67,7 @@ namespace Task_1.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            Country country = db.Countries.Find(id);
+            Country country = _countryService.GetCountryById((int)id);
             if (country == null)
             {
                 return HttpNotFound();
@@ -83,8 +84,7 @@ namespace Task_1.Controllers
         {
             if (ModelState.IsValid)
             {
-                db.Entry(country).State = EntityState.Modified;
-                db.SaveChanges();
+                _countryService.UpdateCountry(country);
                 return RedirectToAction("Index");
             }
             return View(country);
@@ -97,7 +97,7 @@ namespace Task_1.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            Country country = db.Countries.Find(id);
+            Country country = _countryService.GetCountryById((int)id);
             if (country == null)
             {
                 return HttpNotFound();
@@ -110,9 +110,7 @@ namespace Task_1.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult DeleteConfirmed(int id)
         {
-            Country country = db.Countries.Find(id);
-            db.Countries.Remove(country);
-            db.SaveChanges();
+            _countryService.DeleteCountry(id);
             return RedirectToAction("Index");
         }
 
@@ -120,7 +118,7 @@ namespace Task_1.Controllers
         {
             if (disposing)
             {
-                db.Dispose();
+                _countryService.Dispose();
             }
             base.Dispose(disposing);
         }

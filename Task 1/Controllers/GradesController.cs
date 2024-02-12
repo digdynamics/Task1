@@ -8,17 +8,19 @@ using System.Web;
 using System.Web.Mvc;
 using Task_1.Data;
 using Task_1.Models;
+using Task_1.Services;
 
 namespace Task_1.Controllers
 {
     public class GradesController : Controller
     {
         private ApplicationDbContext db = new ApplicationDbContext();
+        private GradeService _gradeService = new GradeService();
 
         // GET: Grades
         public ActionResult Index()
         {
-            return View(db.Grades.ToList());
+            return View(_gradeService.GetGrades());
         }
 
         // GET: Grades/Details/5
@@ -28,7 +30,7 @@ namespace Task_1.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            Grade grade = db.Grades.Find(id);
+            Grade grade = _gradeService.GetGradeById((int)id);
             if (grade == null)
             {
                 return HttpNotFound();
@@ -51,8 +53,7 @@ namespace Task_1.Controllers
         {
             if (ModelState.IsValid)
             {
-                db.Grades.Add(grade);
-                db.SaveChanges();
+                _gradeService.AddGrade(grade);
                 return RedirectToAction("Index");
             }
 
@@ -66,7 +67,7 @@ namespace Task_1.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            Grade grade = db.Grades.Find(id);
+            Grade grade = _gradeService.GetGradeById((int)id);
             if (grade == null)
             {
                 return HttpNotFound();
@@ -83,8 +84,7 @@ namespace Task_1.Controllers
         {
             if (ModelState.IsValid)
             {
-                db.Entry(grade).State = EntityState.Modified;
-                db.SaveChanges();
+                _gradeService.UpdateGrade(grade);
                 return RedirectToAction("Index");
             }
             return View(grade);
@@ -97,7 +97,7 @@ namespace Task_1.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            Grade grade = db.Grades.Find(id);
+            Grade grade = _gradeService.GetGradeById((int)id);
             if (grade == null)
             {
                 return HttpNotFound();
@@ -110,9 +110,7 @@ namespace Task_1.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult DeleteConfirmed(int id)
         {
-            Grade grade = db.Grades.Find(id);
-            db.Grades.Remove(grade);
-            db.SaveChanges();
+            _gradeService.DeleteGrade(id);
             return RedirectToAction("Index");
         }
 
@@ -120,7 +118,7 @@ namespace Task_1.Controllers
         {
             if (disposing)
             {
-                db.Dispose();
+                _gradeService.Dispose();
             }
             base.Dispose(disposing);
         }

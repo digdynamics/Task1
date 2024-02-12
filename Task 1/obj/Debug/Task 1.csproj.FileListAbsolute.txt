@@ -474,3 +474,7 @@ C:\Users\mohamedfci_1080\Desktop\Task 1\Task 1\obj\Debug\Task 1.csproj.CoreCompi
 C:\Users\mohamedfci_1080\Desktop\Task 1\Task 1\obj\Debug\Task 1.csproj.CopyComplete
 C:\Users\mohamedfci_1080\Desktop\Task 1\Task 1\obj\Debug\Task 1.dll
 C:\Users\mohamedfci_1080\Desktop\Task 1\Task 1\obj\Debug\Task 1.pdb
+C:\Users\mohamedfci_1080\Desktop\Task 1\Task 1\bin\PagedList.dll
+C:\Users\mohamedfci_1080\Desktop\Task 1\Task 1\bin\PagedList.Mvc.dll
+C:\Users\mohamedfci_1080\Desktop\Task 1\Task 1\bin\PagedList.xml
+C:\Users\mohamedfci_1080\Desktop\Task 1\Task 1\bin\PagedList.Mvc.xml

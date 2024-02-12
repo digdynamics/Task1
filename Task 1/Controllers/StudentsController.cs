@@ -16,18 +16,27 @@ using Rotativa.MVC;
 using Newtonsoft.Json.Linq;
 using System.Text;
 using Microsoft.Reporting.WebForms;
+using PagedList;
+using Task_1.Services;
 
 namespace Task_1.Controllers
 {
     public class StudentsController : Controller
     {
         private ApplicationDbContext db = new ApplicationDbContext();
+        private readonly StudentService _studentService;
+
+        public StudentsController()
+        {
+            
+            _studentService = new StudentService();
+        }
 
         // GET: Students
         public ActionResult Index()
         {
-            var students = db.Students.Include(s => s.Country).Include(s => s.Grade);
-            return View(students.ToList());
+            var students = _studentService.GetStudents();
+            return View(students);
         }
 
         // GET: Students/Details/5
@@ -37,7 +46,7 @@ namespace Task_1.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            Student student = db.Students.Find(id);
+            Student student = _studentService.GetStudentById((int)id);
             if (student == null)
             {
                 return HttpNotFound();
@@ -62,8 +71,9 @@ namespace Task_1.Controllers
         {
             if (ModelState.IsValid)
             {
-                db.Students.Add(student);
-                db.SaveChanges();
+                //db.Students.Add(student);
+                //db.SaveChanges();
+                _studentService.CreateStudent(student);
                 return RedirectToAction("Index");
             }
 
@@ -79,7 +89,7 @@ namespace Task_1.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            Student student = db.Students.Find(id);
+            Student student = _studentService.GetStudentById((int)id);
             if (student == null)
             {
                 return HttpNotFound();
@@ -98,8 +108,7 @@ namespace Task_1.Controllers
         {
             if (ModelState.IsValid)
             {
-                db.Entry(student).State = EntityState.Modified;
-                db.SaveChanges();
+                _studentService.UpdateStudent(student);
                 return RedirectToAction("Index");
             }
             ViewBag.CountryId = new SelectList(db.Countries, "CountryId", "CountryName", student.CountryId);
@@ -114,7 +123,7 @@ namespace Task_1.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            Student student = db.Students.Find(id);
+            Student student = _studentService.GetStudentById((int)id);
             if (student == null)
             {
                 return HttpNotFound();
@@ -127,9 +136,7 @@ namespace Task_1.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult DeleteConfirmed(int id)
         {
-            Student student = db.Students.Find(id);
-            db.Students.Remove(student);
-            db.SaveChanges();
+            _studentService.DeleteStudent(id);
             return RedirectToAction("Index");
         }
 
@@ -137,27 +144,29 @@ namespace Task_1.Controllers
         {
             if (disposing)
             {
-                db.Dispose();
+               _studentService.Dispose();
             }
             base.Dispose(disposing);
         }
 
 
-        public ActionResult Student(string studentName, int? studentId)
+        
+
+        public ActionResult Student(FilterModel<Student> model, string studentName, int? studentId, int? page)
         {
             var students = db.Students
                 .Include(s => s.Country)
                 .Include(s => s.Grade);
 
-            if (studentName != null&&studentName !="" && studentId != null)
+            if (studentName != null && studentName != "" && studentId != null)
             {
-                students = students.Where(x => ( x.StudentId == studentId) && ( x.StudentName == studentName));
+                students = students.Where(x => (x.StudentId == studentId) && (x.StudentName == studentName));
             }
-            else if(studentName != null && studentId == null)
+            else if (studentName != null && studentId == null)
             {
                 students = students.Where(x => x.StudentName == studentName);
             }
-            else if (studentId != null )
+            else if (studentId != null)
             {
                 students = students.Where(x => x.StudentId == studentId);
             }
@@ -168,15 +177,18 @@ namespace Task_1.Controllers
 
             var result = students.ToList();
 
+            int pageSize = 2; // Number of students per page
+            int pageNumber = (page ?? 1);
+
+            model.List = result.ToPagedList(pageNumber, pageSize);
+
             if (Request.IsAjaxRequest())
             {
-                return PartialView("_StudentTablePartialView", result);
+                return PartialView("_StudentTablePartialView", model);
             }
 
-            return View(result);
+            return View(model);
         }
-
-
 
 
 
@@ -232,11 +244,7 @@ namespace Task_1.Controllers
 
 
 
-        //public ActionResult GeneratePdf()
-        //{
-        //    var pdf = new ActionAsPdf("Student");
-        //    return pdf;
-        //}
+        
 
         public ActionResult GeneratePdf(string studentIds)
         {
@@ -264,22 +272,11 @@ namespace Task_1.Controllers
             return View();
         }
 
-        //public ActionResult PrintReport(int studentId)
-        //{
-        //    var student = db.Students
-        //        .Include("Grade")
-        //        .Include("Country")
-        //        .FirstOrDefault(s => s.StudentId == studentId);
-
-        //    return View(student);
-        //}
+       
 
         public ActionResult PrintReport(int studentId)
         {
-            var student = db.Students
-                .Include("Grade")
-                .Include("Country")
-                .FirstOrDefault(s => s.StudentId == studentId);
+            var student = _studentService.GetStudentById(studentId);
 
             var reportViewer = new ReportViewer();
             reportViewer.LocalReport.ReportPath = Server.MapPath("~/RDLC/Report.rdlc"); 

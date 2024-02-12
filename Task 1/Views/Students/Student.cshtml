@@ -1,4 +1,8 @@
-﻿@model IEnumerable<Task_1.Models.Student>
+﻿@*@model IEnumerable<Task_1.Models.Student>*@
+@using PagedList.Mvc
+@*@model PagedList.IPagedList<Task_1.Models.Student>*@
+
+@model Task_1.Models.FilterModel<Task_1.Models.Student>
 
 @{
     ViewBag.Title = "Student";
@@ -17,26 +21,22 @@
 </div>
 
 
-@*<a href="@Url.Action("ExportToExcel", "Students", new { studentIds = string.Join(",", Model.Select(s => s.StudentId)) })" class="btn" style="background-color: darkcyan; color: white;">Excel</a>
-
-    <a href="@Url.Action("GeneratePdf", "Students", new { studentIds = string.Join(",", Model.Select(s => s.StudentId)) })" class="btn" style="background-color: darkgoldenrod; color: white;">Pdf</a>*@
-
 <table id="studentTable" class="table">
     <tr>
         <th>
-            @Html.DisplayNameFor(model => model.StudentId)
+            StudentId
         </th>
         <th>
-            @Html.DisplayNameFor(model => model.StudentName)
+            StudentName
         </th>
         <th>
-            @Html.DisplayNameFor(model => model.BirthDay)
+            BirthDay
         </th>
         <th></th>
     </tr>
-    @if (Model.Count() > 0)
+    @if (Model.List.Count() > 0)
     {
-        foreach (var item in Model)
+        foreach (var item in Model.List)
         {
             <tr>
                 <td>
@@ -58,7 +58,16 @@
             <td colspan="3">No data found.</td>
         </tr>
     }
+    <tr>
+        <td colspan="4">
+            @Html.PagedListPager(Model.List, page => Url.Action("Student", new { page }))
+        </td>
+    </tr>
 </table>
+@*<ul class="pagination">
+    @Html.PagedListPager(Model.List, page => Url.Action("Student", new { page}))
+</ul>*@
+
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 @section Scripts {
     <script>
