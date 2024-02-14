@@ -1,0 +1,19 @@
+﻿@model Task_1.Models.Teacher_View
+
+@{
+    ViewBag.Title = "Details2";
+}
+
+
+<div class="details-container">
+    <h4>Teacher Details</h4>
+    <hr />
+    <p><strong>Name:</strong> @Model.TeacherName</p>
+    <p><strong>Department:</strong> @Model.DepartmentName</p>
+    <p><strong>Address:</strong> @Model.Address</p>
+    <p><strong>Mobile Number:</strong> @Model.MobileNumber</p>
+    <p><strong>Age:</strong> @Model.Age</p>
+</div>
+<div class="back-link">
+    @Html.ActionLink("Back to List", "Teacher", null, new { @class = "btn btn-primary" })
+</div>

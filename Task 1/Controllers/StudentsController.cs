@@ -23,7 +23,7 @@ namespace Task_1.Controllers
 {
     public class StudentsController : Controller
     {
-        private ApplicationDbContext db = new ApplicationDbContext();
+        //private ApplicationDbContext db = new ApplicationDbContext();
         private readonly StudentService _studentService;
 
         public StudentsController()
@@ -57,8 +57,8 @@ namespace Task_1.Controllers
         // GET: Students/Create
         public ActionResult Create()
         {
-            ViewBag.CountryId = new SelectList(db.Countries, "CountryId", "CountryName");
-            ViewBag.GradeId = new SelectList(db.Grades, "GradeId", "GradeName");
+            ViewBag.CountryId = _studentService.GetCountrySelectListForCreate();
+            ViewBag.GradeId = _studentService.GetGradeSelectListForCreate();
             return View();
         }
 
@@ -77,8 +77,8 @@ namespace Task_1.Controllers
                 return RedirectToAction("Index");
             }
 
-            ViewBag.CountryId = new SelectList(db.Countries, "CountryId", "CountryName", student.CountryId);
-            ViewBag.GradeId = new SelectList(db.Grades, "GradeId", "GradeName", student.GradeId);
+            ViewBag.CountryId = _studentService.GetCountrySelectList(student.CountryId);
+            ViewBag.GradeId = _studentService.GetGradeSelectList(student.GradeId);
             return View(student);
         }
 
@@ -94,8 +94,8 @@ namespace Task_1.Controllers
             {
                 return HttpNotFound();
             }
-            ViewBag.CountryId = new SelectList(db.Countries, "CountryId", "CountryName", student.CountryId);
-            ViewBag.GradeId = new SelectList(db.Grades, "GradeId", "GradeName", student.GradeId);
+            ViewBag.CountryId = _studentService.GetCountrySelectList(student.CountryId);
+            ViewBag.GradeId = _studentService.GetGradeSelectList(student.GradeId);
             return View(student);
         }
 
@@ -111,8 +111,8 @@ namespace Task_1.Controllers
                 _studentService.UpdateStudent(student);
                 return RedirectToAction("Index");
             }
-            ViewBag.CountryId = new SelectList(db.Countries, "CountryId", "CountryName", student.CountryId);
-            ViewBag.GradeId = new SelectList(db.Grades, "GradeId", "GradeName", student.GradeId);
+            ViewBag.CountryId = _studentService.GetCountrySelectList(student.CountryId);
+            ViewBag.GradeId = _studentService.GetGradeSelectList(student.GradeId);
             return View(student);
         }
 
@@ -150,32 +150,11 @@ namespace Task_1.Controllers
         }
 
 
-        
 
-        public ActionResult Student(FilterModel<Student> model, string studentName, int? studentId, int? page)
+
+        public ActionResult Student(Models.PagedList<Student> model, string studentName, int? studentId, int? page)
         {
-            var students = db.Students
-                .Include(s => s.Country)
-                .Include(s => s.Grade);
-
-            if (studentName != null && studentName != "" && studentId != null)
-            {
-                students = students.Where(x => (x.StudentId == studentId) && (x.StudentName == studentName));
-            }
-            else if (studentName != null && studentId == null)
-            {
-                students = students.Where(x => x.StudentName == studentName);
-            }
-            else if (studentId != null)
-            {
-                students = students.Where(x => x.StudentId == studentId);
-            }
-            else
-            {
-                students = students;
-            }
-
-            var result = students.ToList();
+            var result = _studentService.GetFilteredStudents(studentName, studentId);
 
             int pageSize = 2; // Number of students per page
             int pageNumber = (page ?? 1);
@@ -199,63 +178,30 @@ namespace Task_1.Controllers
             {
                 try
                 {
-                    ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
-
-                    var idsArray = studentIds.Split(',').Select(int.Parse).ToList();
-
-                    var students = db.Students
-                        .Include(s => s.Country)
-                        .Include(s => s.Grade)
-                        .Where(s => idsArray.Contains(s.StudentId))
-                        .ToList();
-
-                    var excelPackage = new ExcelPackage();
-                    var worksheet = excelPackage.Workbook.Worksheets.Add("Students");
-
-                    worksheet.Cells["A1"].Value = "Student ID";
-                    worksheet.Cells["B1"].Value = "Student Name";
-                    worksheet.Cells["C1"].Value = "Birthday";
-                    // Add other headers as needed
-
-                    int row = 2;
-                    foreach (var student in students)
-                    {
-                        worksheet.Cells[string.Format("A{0}", row)].Value = student.StudentId;
-                        worksheet.Cells[string.Format("B{0}", row)].Value = student.StudentName;
-                        worksheet.Cells[string.Format("c{0}", row)].Value = student.BirthDay.ToString("MM/dd/yyyy");
-                        // Add other data as needed
-                        row++;
-                    }
-
-                    byte[] fileContents = excelPackage.GetAsByteArray();
+                    byte[] fileContents = _studentService.ExportStudentsToExcel(studentIds);
                     return File(fileContents, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "Students.xlsx");
                 }
                 catch (Exception ex)
                 {
-
+                    
                     return View("Error");
                 }
             }
             else
             {
                 return RedirectToAction("Student");
-            }           
+            }
         }
 
 
 
-        
+
 
         public ActionResult GeneratePdf(string studentIds)
         {
             if (studentIds != null)
             {
-                var idsArray = studentIds.Split(',').Select(int.Parse).ToList();
-                var students = db.Students
-                        .Include(s => s.Country)
-                        .Include(s => s.Grade)
-                        .Where(s => idsArray.Contains(s.StudentId))
-                        .ToList();
+                var students = _studentService.GetStudentsByIds(studentIds);
                 return new ViewAsPdf("_PdfPartialView", students) { FileName = "StudentTable.pdf" };
             }
             else
@@ -268,7 +214,7 @@ namespace Task_1.Controllers
 
         public ActionResult StudentReport()
         {
-            ViewBag.Students = new SelectList(db.Students, "StudentId", "StudentName");
+            ViewBag.Students = _studentService.GetStudentsSelectList();
             return View();
         }
 

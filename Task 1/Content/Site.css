@@ -47,3 +47,63 @@ textarea {
         color: #fff;
         border: 1px solid #007bff;
     }
+
+
+
+.details-container {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 20px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    background-color: #f9f9f9;
+}
+
+    .details-container h4 {
+        text-align: center;
+    }
+
+    .details-container hr {
+        border: 0;
+        border-top: 1px solid #eee;
+    }
+
+    .details-container p {
+        margin-bottom: 10px;
+    }
+
+        .details-container p strong {
+            font-weight: bold;
+        }
+
+.back-link {
+    text-align: center;
+    margin-top: 20px;
+}
+
+    .back-link a {
+        text-decoration: none;
+        color: #fff;
+    }
+
+        .back-link a.btn {
+            display: inline-block;
+            padding: 6px 12px;
+            margin-bottom: 0;
+            font-size: 14px;
+            font-weight: 400;
+            line-height: 1.42857143;
+            text-align: center;
+            white-space: nowrap;
+            vertical-align: middle;
+            cursor: pointer;
+            background-image: none;
+            border: 1px solid transparent;
+            border-radius: 4px;
+        }
+
+        .back-link a.btn-primary {
+            color: #fff;
+            background-color: #337ab7;
+            border-color: #2e6da4;
+        }

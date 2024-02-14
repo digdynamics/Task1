@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data.Entity;
+using System.Data.Entity.Infrastructure;
 using System.Linq;
 using System.Web;
 using Task_1.Models;
@@ -13,8 +14,12 @@ namespace Task_1.Data
            : base("name=ApplicationDbContext")
         {
         }
+        
         public virtual DbSet<Student> Students { get; set; }
         public virtual DbSet<Country> Countries { get; set; }
         public virtual DbSet<Grade> Grades { get; set; }
+        public virtual DbSet<Teacher> Teachers { get; set; }
+        public virtual DbSet<Department> Departments { get; set; }
+        
     }
 }

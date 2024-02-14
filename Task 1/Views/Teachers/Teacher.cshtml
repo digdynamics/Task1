@@ -1,0 +1,75 @@
+﻿@model IEnumerable<Task_1.Models.Teacher_View>
+
+@{
+    ViewBag.Title = "Teachers";
+}
+
+<style>
+    .table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+        .table th, .table td {
+            border: 1px solid #dddddd;
+            padding: 8px;
+            text-align: left;
+        }
+
+        .table th {
+            background-color: #f2f2f2;
+        }
+
+        .table tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+</style>
+
+<h2>Teachers</h2>
+
+<table class="table">
+    <tr>
+
+        <th>
+            Teacher Name
+        </th>
+        <th>
+            Department
+        </th>
+        @*<th>
+            Address
+        </th>
+        <th>
+            Mobile Number
+        </th>
+        <th>
+            Age
+        </th>*@
+        <th></th>
+    </tr>
+
+    @foreach (var item in Model)
+    {
+        <tr>
+
+            <td>
+                @Html.DisplayFor(modelItem => item.TeacherName)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.DepartmentName)
+            </td>
+            @*<td>
+            @Html.DisplayFor(modelItem => item.Address)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.MobileNumber)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.Age)
+        </td>*@
+            <td>
+                @Html.ActionLink("Details", "TeacherDetails", new { teacherId = item.TeacherId }, new { @class = "btn btn-primary" })
+            </td>
+        </tr>
+    }
+</table>
